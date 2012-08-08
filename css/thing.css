@@ -1,0 +1,9 @@
+body {
+	font-size: 1.5em;
+	text-align: center;
+}
+#output {
+	height: 3em;
+	margin: 1em;
+	font-size: 2em;
+}

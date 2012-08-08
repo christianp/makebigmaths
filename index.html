@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>make big maths, by cp</title>
+
+		<!-- jquery -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+		<!-- knockout -->
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/knockout/2.0.0/knockout-min.js"></script>
+
+		<!-- normalise.css -->
+		<link rel="stylesheet" href="http://css.cdn.tl/normalize.css"></link>
+
+		<!-- mathjax -->
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			extensions: ["tex2jax.js"],
+			jax: ["input/TeX", "output/HTML-CSS"],
+			tex2jax: {
+			  inlineMath: [ ['$','$'] ],
+			  displayMath: [ ["\\[","\\]"] ],
+			  processEscapes: true
+			},
+			"HTML-CSS": { availableFonts: ["TeX"] }
+		  });
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+
+		<script type="text/javascript" src="js/thing.js"></script>
+		<link rel="stylesheet" href="css/thing.css"></link>
+	</head>
+	<body>
+		<div id="input">
+			<p>LaTeX: <input id="tex" type="text"/></p>
+			<p>Size: <input id="size" type="range" min="1" max="30" value="10"></p>
+		</div>
+		<div id="output"></div>
+		<div>Link to this: <a id="link"></a></div>
+	</body>
+</html>
+
+
+
