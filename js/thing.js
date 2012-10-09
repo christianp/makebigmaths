@@ -11,6 +11,7 @@ function display() {
 	var tex = $('#input #tex').val();
 	$('#output').html('\\['+tex+'\\]');
 	MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
+	if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
 	var url = window.location.origin+window.location.pathname+'?'+tex;
 	$('#link').text(url).attr('href',url);
 }
