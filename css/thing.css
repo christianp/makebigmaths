@@ -7,3 +7,9 @@ body {
 	margin: 1em;
 	font-size: 2em;
 }
+
+#credit {
+	font-size: smaller;
+	color: #666;
+	margin-top: 5em;
+}
