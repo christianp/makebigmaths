@@ -9,6 +9,7 @@
 
 function display() {
 	var tex = $('#input #tex').val();
+	tex = encodeURIComponent(tex);
 	$('#output').html('\\['+tex+'\\]');
 	MathJax.Hub.Queue(['Typeset',MathJax.Hub]);
 	var url = window.location.origin+window.location.pathname+'?'+tex;
