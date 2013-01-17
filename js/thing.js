@@ -24,6 +24,9 @@ $(function() {
 		display();
 	});
 	display();
-	if(location.search.length)
-		$('#input #tex').val(unescape(location.search.slice(1))).change();
+	if(location.search.length) {
+		var tex = location.search.slice(1);
+		tex = unescape(tex.replace(/\+/g,' '));
+		$('#input #tex').val(tex).change();
+	}
 });
