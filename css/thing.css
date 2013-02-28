@@ -3,7 +3,7 @@ body {
 	text-align: center;
 }
 #output {
-	height: 3em;
+	min-height: 3em;
 	margin: 1em;
 	font-size: 2em;
 }
