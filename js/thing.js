@@ -9,27 +9,67 @@
 
 function display() {
 	var tex = $('#input #tex').val();
+	var size = getSize();
 	var script = document.createElement('script');
 	script.setAttribute('type','math/tex');
 	script.textContent = tex;
 	$('#output').html(script);
 	MathJax.Hub.Queue(['Typeset',MathJax.Hub,window.output]);
 	if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
-	var url = window.location.origin+window.location.pathname+(tex.length ? '?'+encodeURIComponent(tex) : '');
+	var searchParams = makeSearchParams({
+		tex: tex,
+		size: size
+	});
+	var url = window.location.origin+window.location.pathname+(tex.length ? '?'+searchParams : '');
 	$('#link').text(url).attr('href',url);
+}
+
+function getSearchParams() {
+	var search = location.search.slice(1);
+	var bits = search.split('&');
+	var obj = {};
+	var re_component = /^(?:(\w+)=)?(.*)$/;
+	for(var i=0;i<bits.length;i++) {
+		var m = re_component.exec(bits[i]);
+		var name = m[1] || '_query';
+		var value = m[2];
+		obj[name] = value;
+	}
+	console.log(obj);
+	return obj;
+}
+
+function makeSearchParams(obj) {
+	var query = [];
+	for(var key in obj) {
+		query.push(encodeURIComponent(key)+'='+encodeURIComponent(obj[key]));
+	}
+	return query.join('&');
+}
+
+var size_scale = 5;
+function getSize() {
+	return $('#input #size').val()/size_scale;
+}
+function setSize(size) {
+	$('#input #size').val(size*size_scale).change();
 }
 
 $(function() {
 	$('#input #tex').on('change keyup',display);
 	$('#input #size').on('change',function() {
-		var size = parseFloat($(this).val())/5;
+		var size = getSize();
 		$('#output').css('font-size',size+'em');
 		display();
 	});
 	display();
 	if(location.search.length) {
-		var tex = location.search.slice(1);
+		var query = getSearchParams();
+		var tex = query.tex || query['_query'];
+		var size = query.size || 2;
 		tex = unescape(tex.replace(/\+/g,' '));
 		$('#input #tex').val(tex).change();
+		console.log(size);
+		setSize(size);
 	}
 });
