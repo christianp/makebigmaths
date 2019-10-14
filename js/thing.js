@@ -7,69 +7,77 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+var tex_input = document.getElementById('tex');
+var size_input = document.getElementById('size');
+var output_element = document.getElementById('output');
+var link_element = document.getElementById('link');
+
+var state = {
+    tex: '',
+    size: 5
+}
+
 function display() {
-	var tex = $('#input #tex').val();
-	var size = getSize();
-	var script = document.createElement('script');
-	script.setAttribute('type','math/tex');
-	script.textContent = tex;
-	$('#output').html(script);
-	MathJax.Hub.Queue(['Typeset',MathJax.Hub,window.output]);
-	if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
-	var searchParams = makeSearchParams({
-		tex: tex,
-		size: size
-	});
-	var url = window.location.origin+window.location.pathname+(tex.length ? '?'+searchParams : '');
-	$('#link').text(url).attr('href',url);
+    var tex = state.tex = tex_input.value;
+    var size = state.size = parseFloat(size_input.value);
+    console.log('display',tex);
+    output_element.innerHTML = '';
+    output_element.style['font-size'] = size+'em';
+
+    MathJax.texReset();
+    var options = MathJax.getMetricsFor(output);
+    options.display = true;
+    try {
+        var html = MathJax.tex2chtml(tex,options);
+        output.appendChild(html);
+        MathJax.startup.document.clear();
+        MathJax.startup.document.updateDocument();
+    } catch(e) {
+        output.innerHTML = e.message;
+    }
+
+    if (!window.location.origin) {
+        window.location.origin = window.location.protocol+"//"+window.location.host;
+    }
+    var searchParams = makeSearchParams(state);
+    var url = window.location.origin+window.location.pathname+(tex.length ? '?'+searchParams : '');
+    link_element.textContent = url;
+    link_element.setAttribute('href',url);
 }
 
 function getSearchParams() {
-	var search = location.search.slice(1);
-	var bits = search.split('&');
-	var obj = {};
-	var re_component = /^(?:(\w+)=)?(.*)$/;
-	for(var i=0;i<bits.length;i++) {
-		var m = re_component.exec(bits[i]);
-		var name = m[1] || '_query';
-		var value = m[2];
-		obj[name] = value;
-	}
-	console.log(obj);
-	return obj;
+    var search = location.search.slice(1);
+    var bits = search.split('&');
+    var obj = {};
+    var re_component = /^(?:(\w+)=)?(.*)$/;
+    for(var i=0;i<bits.length;i++) {
+        var m = re_component.exec(bits[i]);
+        var name = m[1] || '_query';
+        var value = m[2];
+        obj[name] = value;
+    }
+    return obj;
 }
 
 function makeSearchParams(obj) {
-	var query = [];
-	for(var key in obj) {
-		query.push(encodeURIComponent(key)+'='+encodeURIComponent(obj[key]));
-	}
-	return query.join('&');
+    var query = [];
+    for(var key in obj) {
+        query.push(encodeURIComponent(key)+'='+encodeURIComponent(obj[key]));
+    }
+    return query.join('&');
 }
 
-var size_scale = 5;
-function getSize() {
-	return $('#input #size').val()/size_scale;
+function go() {
+    console.log('go');
+    tex_input.addEventListener('input',display);
+    size_input.addEventListener('input',display);
+    if(location.search.length) {
+        var query = getSearchParams();
+        var tex = query.tex || query['_query'];
+        var size = parseFloat(query.size) || 2;
+        tex = unescape(tex.replace(/\+/g,' '));
+        tex_input.value = tex;
+        size_input.value = size;
+    }
+    display();
 }
-function setSize(size) {
-	$('#input #size').val(size*size_scale).change();
-}
-
-$(function() {
-	$('#input #tex').on('change keyup',display);
-	$('#input #size').on('change',function() {
-		var size = getSize();
-		$('#output').css('font-size',size+'em');
-		display();
-	});
-	display();
-	if(location.search.length) {
-		var query = getSearchParams();
-		var tex = query.tex || query['_query'];
-		var size = query.size || 2;
-		tex = unescape(tex.replace(/\+/g,' '));
-		$('#input #tex').val(tex).change();
-		console.log(size);
-		setSize(size);
-	}
-});
