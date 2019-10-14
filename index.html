@@ -9,15 +9,12 @@
             MathJax = {
                 loader: {
                     ready: function() {
-                        console.log('arg');
                         MathJax.startup.defaultReady();
-                        go();
-                    },
-                    pageReady: function() {
-                        MathJax.startup.defaultPageReady();
-                        go();
+						if(!window.started && window.go) {
+	                        go();
+						}
                     }
-                }
+				}
             };
         </script>
         <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>

@@ -20,7 +20,6 @@ var state = {
 function display() {
     var tex = state.tex = tex_input.value;
     var size = state.size = parseFloat(size_input.value);
-    console.log('display',tex);
     output_element.innerHTML = '';
     output_element.style['font-size'] = size+'em';
 
@@ -68,7 +67,6 @@ function makeSearchParams(obj) {
 }
 
 function go() {
-    console.log('go');
     tex_input.addEventListener('input',display);
     size_input.addEventListener('input',display);
     if(location.search.length) {
@@ -80,4 +78,11 @@ function go() {
         size_input.value = size;
     }
     display();
+	window.started = true;
+}
+
+if(window.MathJax) {
+	MathJax.startup.promise.then(function() {
+		go();
+	});
 }
