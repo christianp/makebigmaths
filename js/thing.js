@@ -10,6 +10,7 @@
 var tex_input = document.getElementById('tex');
 var size_input = document.getElementById('size');
 var output_element = document.getElementById('output');
+var output_speech_element = document.getElementById('output-speech');
 var link_element = document.getElementById('link');
 
 var state = {
@@ -17,22 +18,31 @@ var state = {
     size: 5
 }
 
-function display() {
-    var tex = state.tex = tex_input.value;
+function set_size() {
     var size = state.size = parseFloat(size_input.value);
-    output_element.innerHTML = '';
     output_element.style['font-size'] = size+'em';
+}
+
+async function display() {
+    var tex = state.tex = tex_input.value;
+    output_element.innerHTML = '';
 
     MathJax.texReset();
-    var options = MathJax.getMetricsFor(output);
-    options.display = true;
+    var options = MathJax.getMetricsFor(output_element,true);
+    if(!options.family) {
+        delete options.family;
+    }
     try {
-        var html = MathJax.tex2chtml(tex,options);
-        output.appendChild(html);
+        var mml = await MathJax.tex2mmlPromise(tex,options);
+        output_element.innerHTML = mml;
+        const speech_element = output_element.querySelector('[data-semantic-speech]');
+        const speech = speech_element ? speech_element.getAttribute('data-semantic-speech') : '';
+        output_speech_element.textContent = speech;
+
         MathJax.startup.document.clear();
         MathJax.startup.document.updateDocument();
     } catch(e) {
-        output.innerHTML = e.message;
+        output_element.innerHTML = e.message;
     }
 
     if (!window.location.origin) {
@@ -66,9 +76,10 @@ function makeSearchParams(obj) {
     return query.join('&');
 }
 
-function go() {
+(async function() {
+	await MathJax.startup.promise;
     tex_input.addEventListener('input',display);
-    size_input.addEventListener('input',display);
+    size_input.addEventListener('input',set_size);
     if(location.search.length) {
         var query = getSearchParams();
         var tex = query.tex || query['_query'];
@@ -79,10 +90,4 @@ function go() {
     }
     display();
 	window.started = true;
-}
-
-if(window.MathJax) {
-	MathJax.startup.promise.then(function() {
-		go();
-	});
-}
+})();

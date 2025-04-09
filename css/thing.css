@@ -2,6 +2,26 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: Asana-Math;
+    src: url("fonts/Asana-Math.otf");
+}
+
+@font-face {
+    font-family: Latin-Modern;
+    src: url("fonts/latinmodern-math-1959/otf/latinmodern-math.otf");
+}
+
+@font-face {
+    font-family: STIX;
+    src: url("fonts/STIX/STIXTwoMath-Regular.otf");
+}
+
+
+math {
+    font-family: Latin-Modern;
+}
+
 html {
     font-size: 18px;
 }
@@ -28,4 +48,12 @@ body {
     font-size: smaller;
     color: #666;
     margin-top: 5em;
+}
+
+dt {
+    font-weight: bold;
+}
+dl {
+    text-align: start;
+    margin: 2em;
 }
