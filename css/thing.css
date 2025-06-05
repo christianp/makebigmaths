@@ -13,13 +13,21 @@
 }
 
 @font-face {
+    font-family: Luciole;
+    src: url("fonts/Luciole-Math/Luciole-Math.otf");
+}
+
+@font-face {
     font-family: STIX;
     src: url("fonts/STIX/STIXTwoMath-Regular.otf");
 }
 
+:root {
+    --math-font: Latin-Modern;
+}
 
 math {
-    font-family: Latin-Modern;
+    font-family: var(--math-font);
 }
 
 html {
@@ -28,6 +36,15 @@ html {
 
 body {
     text-align: center;
+    display: grid;
+    grid-template-rows: 20svh 1fr auto;
+    min-height: 100svh;
+    margin: 0;
+    padding: 0.5em;
+}
+
+input[type="range"] {
+    vertical-align: middle;
 }
 
 #tex {
@@ -36,12 +53,15 @@ body {
     width: 100%;
     min-height: 8em;
     padding: 0.5em;
+    resize: none;
 }
 
 #output {
     min-height: 3em;
     margin: 1em;
-    font-size: 2em;
+    --size: 2;
+    font-size: calc(1em * var(--size));
+    align-self: center;
 }
 
 #credit {
@@ -57,3 +77,4 @@ dl {
     text-align: start;
     margin: 2em;
 }
+

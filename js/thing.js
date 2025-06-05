@@ -7,8 +7,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var tex_input = document.getElementById('tex');
-var size_input = document.getElementById('size');
+var input_form = document.getElementById('input');
+const tex_input = document.getElementById('tex');
+const size_input = document.getElementById('size');
 var output_element = document.getElementById('output');
 var output_speech_element = document.getElementById('output-speech');
 var link_element = document.getElementById('link');
@@ -18,13 +19,18 @@ var state = {
     size: 5
 }
 
-function set_size() {
-    var size = state.size = parseFloat(size_input.value);
-    output_element.style['font-size'] = size+'em';
+function set_display() {
+    const fd = new FormData(input_form);
+    var size = fd.get('size');
+    output_element.style.setProperty('--size',fd.get('size'));
+    output_element.style.setProperty('--math-font',fd.get('font'));
+
+    update_link();
 }
 
 async function display() {
-    var tex = state.tex = tex_input.value;
+    const fd = new FormData(input_form);
+    const tex = fd.get('tex');
     output_element.innerHTML = '';
 
     MathJax.texReset();
@@ -48,8 +54,12 @@ async function display() {
     if (!window.location.origin) {
         window.location.origin = window.location.protocol+"//"+window.location.host;
     }
-    var searchParams = makeSearchParams(state);
-    var url = window.location.origin+window.location.pathname+(tex.length ? '?'+searchParams : '');
+
+    update_link();
+}
+
+function update_link() {
+    const url = makeSearchParams();
     link_element.textContent = url;
     link_element.setAttribute('href',url);
 }
@@ -69,25 +79,25 @@ function getSearchParams() {
 }
 
 function makeSearchParams(obj) {
-    var query = [];
-    for(var key in obj) {
-        query.push(encodeURIComponent(key)+'='+encodeURIComponent(obj[key]));
-    }
-    return query.join('&');
+    const fd = new FormData(input_form);
+    const url = new URL(location);
+    fd.entries().forEach(([key,value]) => url.searchParams.set(key,value));
+    return url.toString();
 }
 
 (async function() {
 	await MathJax.startup.promise;
     tex_input.addEventListener('input',display);
-    size_input.addEventListener('input',set_size);
-    if(location.search.length) {
-        var query = getSearchParams();
-        var tex = query.tex || query['_query'];
-        var size = parseFloat(query.size) || 2;
-        tex = unescape(tex.replace(/\+/g,' '));
+    [...document.querySelectorAll('input,select')].forEach(el => el.addEventListener('input',set_display));
+
+    const {searchParams} = new URL(location);
+    let tex = searchParams.get('tex');
+    if(tex) {
+        var size = parseFloat(searchParams.get('size')) || 2;
         tex_input.value = tex;
         size_input.value = size;
     }
+
     display();
-	window.started = true;
+    set_display();
 })();
